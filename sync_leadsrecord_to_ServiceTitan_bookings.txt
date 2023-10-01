@@ -1,0 +1,42 @@
+// Get deal data
+getlead = zoho.crm.getRecordById("Leads",id);
+externalId = getlead.getJson("Auto_Number_1");
+info externalId;
+First_Name = getlead.getJson("First_Name");
+City = getlead.getJson("City");
+State = getlead.getJson("State");
+Country = getlead.getJson("Country");
+Street = getlead.getJson("Street").toString();
+Zip = getlead.getJson("Zip_Code");
+Phone = getlead.getJson("Phone").toString();
+Description = getlead.getJson("Description");
+BookingID = getlead.getJson("Booking_ID");
+//  Update data into serviceTitan
+// ================Get access token=============
+body = Map();
+body.put("grant_type","client_credentials");
+body.put("client_id","cid.ogxo2v4jcx7xegvhsui1rzwyg");
+body.put("client_secret","cs1.mmd5cd8kuc40mkx2hha5scyii8q6vuurx1gqn7njd2a2ystzda");
+token_res = invokeurl
+[
+	url :"https://auth.servicetitan.io/connect/token"
+	type :POST
+	parameters:body
+];
+// info token_res;
+access_token = token_res.get("access_token");
+// info access_token;
+// +++++++++++ Put records in serviceTitan=======
+header = Map();
+header.put("Authorization",access_token);
+header.put("ST-App-Key","ak1.k2tz9r6isp1sylwjgq98eawmh");
+header.put("Content-Type","application/json");
+map2 = {"source":"Web","name":First_Name,"address":{"street":Street,"unit":"","city":City,"state":State,"zip":Zip,"country":Country},"contacts":{{"type":"Phone","value":Phone,"memo":"  "}},"summary":Description,"isFirstTimeClient":"true","externalId":externalId};
+service_titan = invokeurl
+[
+	url :"https://api.servicetitan.io/crm/v2/tenant/1793476117/booking-provider/" + BookingID + "/bookings"
+	type :POST
+	parameters:map2.toString()
+	headers:header
+];
+info service_titan;
